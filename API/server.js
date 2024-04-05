@@ -12,8 +12,23 @@ server.get('/alunos', (req, res) => {
     res.json(alunos);
 });
 
+server.delete("/alunos/:id", (req, res) => {
+  const id = req.params.id;
+
+  const index = alunos.findIndex(aluno => aluno.id === parseInt(id));
+
+  if (index === -1) {
+    return res.status(404).json({ mensagem: "Aluno não encontrado" });
+  }
+
+  alunos.splice(index, 1);
+
+  res.status(200).json({ mensagem: "Aluno excluído com sucesso" });
+});
+
+
 const alunos = [
-    { "nome": "Ana", "email": "ana@email.com", "curso": "Matemática" },
-    { "nome": "João", "email": "joao@email.com", "curso": "História" },
-    { "nome": "Maria", "email": "maria@email.com", "curso": "Biologia" },
+    { "id": 1, "nome": "Ana", "email": "ana@email.com", "curso": "Matemática" },
+    { "id": 2, "nome": "João", "email": "joao@email.com", "curso": "História" },
+    { "id": 3, "nome": "Maria", "email": "maria@email.com", "curso": "Biologia" },
 ];
