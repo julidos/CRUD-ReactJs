@@ -1,7 +1,7 @@
 function Alunos() {
     return (
         <div>
-            <p>Esta é a página Alunos</p>
+            <p>Esta é a página alunos</p>
         </div>
     )
 }

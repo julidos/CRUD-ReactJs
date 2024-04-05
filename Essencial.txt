@@ -1,3 +1,11 @@
 npx create-react-app nome-projeto (Criar o projeto)
 
 npm start (Começar a rodar o servidor)
+
+Ctrl + D (Localizar por nome igual)
+
+Ctrl + ; (Comentar de acorod com a linguagem)
+
+Ctrl + Shift + P (Abre os negócio do VS Code)
+
+Envolver Abreviação (Envolve a parte selecionada com a tag que você escrever)
