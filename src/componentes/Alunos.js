@@ -12,8 +12,11 @@ class Alunos extends React.Component {
     }
 
     componentDidMount(){
-        fetch("")
-            .then(resposta => resposta.json())
+        fetch("http://localhost:5001/alunos")
+            .then(res => res.json())
+            .then(dados => {
+                this.setState({alunos : dados})
+            })
     }
 
     componentWillUnmount(){
