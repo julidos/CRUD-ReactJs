@@ -1,13 +1,13 @@
 import React from "react";
-import {Table, Button} from "react-bootstrap";
+import { Table, Button, Forms } from "react-bootstrap";
 
-class Alunos extends React.Component { 
+class Alunos extends React.Component {
 
-    constructor(props){
+    constructor(props) {
         super(props);
 
         this.state = {
-            alunos : []
+            alunos: []
         }
     }
 
@@ -15,31 +15,31 @@ class Alunos extends React.Component {
         this.buscarAluno();
     }
 
-    componentWillUnmount(){
-        
+    componentWillUnmount() {
+
     }
 
     buscarAluno = () => {
         fetch("http://localhost:5001/alunos")
-        .then(res => res.json())
-        .then(dados => {
-            this.setState({alunos : dados})
-        })
+            .then(res => res.json())
+            .then(dados => {
+                this.setState({ alunos: dados })
+            })
     }
 
-    deletarAluno(id){
-        fetch("http://localhost:5001/alunos/" +id, { method: 'DELETE'})
-        .then(resposta => {
-            if(resposta.ok){
-                this.buscarAluno();
-            }
-            else{
-                alert("Aluno não encontrado")
-            }
-        })
+    deletarAluno(id) {
+        fetch("http://localhost:5001/alunos/" + id, { method: 'DELETE' })
+            .then(resposta => {
+                if (resposta.ok) {
+                    this.buscarAluno();
+                }
+                else {
+                    alert("Aluno não encontrado")
+                }
+            })
     }
 
-    render(){ 
+    renderTabela() {
         return (
             <Table striped bordered hover variant="dark">
                 <thead>
@@ -71,7 +71,13 @@ class Alunos extends React.Component {
             </Table>
         )
     }
-
+    render() {
+        return (
+            <div>
+                {this.renderTabela()};
+            </div>
+        )
+    }
 }
 
 export default Alunos;

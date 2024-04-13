@@ -14,11 +14,11 @@ server.get('/alunos', (req, res) => {
 
 server.delete("/alunos/:id", (req, res) => {
 
-  const id = req.params.id;
+    const id = req.params.id;
 
-  const index = alunos.findIndex(aluno => aluno.id === parseInt(id));
-  alunos.splice(index, 1);
-  res.status(200).json({ mensagem: "Aluno excluído com sucesso" });
+    const index = alunos.findIndex(aluno => aluno.id === parseInt(id));
+    alunos.splice(index, 1);
+    res.status(200).json({ mensagem: "Aluno excluído com sucesso" });
 });
 
 
