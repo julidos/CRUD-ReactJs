@@ -12,6 +12,7 @@ class Alunos extends React.Component {
             curso: '',
             alunos: [],
             modalAberta: false,
+            confirmaExcluir: false
         };
         this.apiUrl = 'http://localhost:5001/alunos';
     }
@@ -39,6 +40,7 @@ class Alunos extends React.Component {
                 }
             })
             .catch(error => console.error('Erro ao deletar aluno:', error));
+        this.resetCampos();
     }
 
     carregarDados = (id) => {
@@ -56,6 +58,7 @@ class Alunos extends React.Component {
     }
 
     cadastraAluno = (aluno) => {
+        console.log('Enviando solicitação para adicionar aluno:', aluno);
         fetch(this.apiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -63,13 +66,18 @@ class Alunos extends React.Component {
         })
             .then(resposta => {
                 if (resposta.ok) {
+                    console.log('Aluno adicionado com sucesso!');
+                    // Após adicionar o aluno com sucesso, buscamos novamente a lista de alunos
                     this.buscarAlunos();
                 } else {
+                    console.error("Erro ao adicionar aluno. Status:", resposta.status);
                     alert("Não foi possível adicionar o aluno");
                 }
             })
             .catch(error => console.error('Erro ao cadastrar aluno:', error));
+        this.resetCampos();
     }
+
 
     atualizarAluno = (aluno) => {
         fetch(`${this.apiUrl}/${aluno.id}`, {
@@ -85,6 +93,7 @@ class Alunos extends React.Component {
                 }
             })
             .catch(error => console.error('Erro ao atualizar aluno:', error));
+        this.resetCampos();
     }
 
     atualizaNome = (e) => {
@@ -114,7 +123,10 @@ class Alunos extends React.Component {
         } else {
             this.atualizarAluno(aluno);
         }
+        this.resetCampos();
+    }
 
+    resetCampos = () => {
         this.setState({
             id: 0,
             nome: '',
@@ -122,6 +134,25 @@ class Alunos extends React.Component {
             curso: ''
         });
     }
+
+    toggleConfirmacaoExclusao = () => {
+        this.setState(prevState => ({
+            confirmaExcluir: !prevState.confirmaExcluir
+        }));
+    }
+
+    abrirModal = () => {
+        this.setState({
+            modalAberta: true
+        });
+    }
+
+    fecharModal = () => {
+        this.setState({
+            modalAberta: false
+        });
+    }
+
 
     renderTabela() {
         return (
@@ -144,7 +175,7 @@ class Alunos extends React.Component {
                             <td>{aluno.curso}</td>
                             <td>
                                 <Button variant="success" onClick={() => { this.carregarDados(aluno.id); this.abrirModal(); }}>Atualizar</Button>
-                                <Button className="ms-1" variant="danger" onClick={() => this.deletarAluno(aluno.id)}>Excluir</Button>
+                                <Button className="ms-1" variant="danger" onClick={() => { this.setState({ id: aluno.id }); this.toggleConfirmacaoExclusao(); }}>Excluir</Button>
                             </td>
                         </tr>
                     ))}
@@ -153,64 +184,80 @@ class Alunos extends React.Component {
         )
     }
 
-    fecharModal = () => {
-        this.setState({
-            modalAberta: false
-        })
-    }
-
-    abrirModal = () => {
-        this.setState({
-            modalAberta: true
-        })
+    confirmarExclusao() {
+        return (
+            <Modal
+                show={this.state.confirmaExcluir}
+                onHide={this.toggleConfirmacaoExclusao} // Updated onHide to toggleConfirmacaoExclusao
+                backdrop="static"
+                keyboard={false}
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title>Tem certeza disso ?</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Você quer mesmo excluir o aluno?
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={this.toggleConfirmacaoExclusao}>
+                        Não
+                    </Button>
+                    <Button className="ms-1" variant="danger" onClick={() => { this.deletarAluno(this.state.id); this.toggleConfirmacaoExclusao(); }}>
+                        Excluir
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        )
     }
 
     renderModal() {
-
-        <Modal
-            show={this.state.modalAberta}
-            onHide={this.fecharModal}
-            backdrop="static"
-            keyboard={false}
-        >
-            <Modal.Header closeButton>
-                <Modal.Title>Cadastrar Aluno</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                <Form>
-                    <FloatingLabel label="ID" className="mb-2 ms-2 ">
-                        <Form.Control type="text" placeholder="Id" value={this.state.id} readOnly={true} />
-                    </FloatingLabel>
-                    <FloatingLabel label="Nome" className="mb-2 ms-2 ">
-                        <Form.Control type="text" placeholder="Nome Sobrenome" value={this.state.nome} onChange={this.atualizaNome} />
-                    </FloatingLabel>
-                    <FloatingLabel label="Email" className="mb-2 ms-2">
-                        <Form.Control type="email" placeholder="nome@exemplo.com" value={this.state.email} onChange={this.atualizaEmail} />
-                    </FloatingLabel>
-                    <FloatingLabel label="Curso" className="mb-2 ms-2">
-                        <Form.Control type="text" placeholder="Curso" value={this.state.curso} onChange={this.atualizaCurso} />
-                    </FloatingLabel>
-                </Form>
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={this.fecharModal}>
-                    Fechar
-                </Button>
-                <Button variant="primary" onClick={() => { this.fecharModal(); this.salvar(); }}>
-                    Salvar
-                </Button>
-            </Modal.Footer>
-        </Modal>
+        return (
+            <Modal
+                show={this.state.modalAberta}
+                onHide={this.fecharModal}
+                backdrop="static"
+                keyboard={false}
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title>Cadastrar Aluno</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+                        <FloatingLabel label="ID" className="mb-2 ms-2 ">
+                            <Form.Control type="text" placeholder="Id" value={this.state.id} readOnly={true} />
+                        </FloatingLabel>
+                        <FloatingLabel label="Nome" className="mb-2 ms-2 ">
+                            <Form.Control type="text" placeholder="Nome Sobrenome" value={this.state.nome} onChange={this.atualizaNome} />
+                        </FloatingLabel>
+                        <FloatingLabel label="Email" className="mb-2 ms-2">
+                            <Form.Control type="email" placeholder="nome@exemplo.com" value={this.state.email} onChange={this.atualizaEmail} />
+                        </FloatingLabel>
+                        <FloatingLabel label="Curso" className="mb-2 ms-2">
+                            <Form.Control type="text" placeholder="Curso" value={this.state.curso} onChange={this.atualizaCurso} />
+                        </FloatingLabel>
+                    </Form>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={this.fecharModal}>
+                        Fechar
+                    </Button>
+                    <Button variant="primary" onClick={() => { this.fecharModal(); this.salvar(); }}>
+                        Salvar
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        )
     }
 
     render() {
         return (
             <div>
-                {this.renderModal()}
-                {this.renderTabela()}
                 <Button className="mb-2 ms-2" variant="primary" onClick={this.abrirModal}>
-                    Novo
+                    Adicionar Aluno
                 </Button>
+                {this.renderModal()}
+                {this.confirmarExclusao()}
+                {this.renderTabela()}
             </div>
         )
     }
